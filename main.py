@@ -30,13 +30,16 @@ def wait_for_db():
     """Wait for database to be ready."""
     from sqlalchemy import create_engine, text
     from app.config import settings
+    import pymysql
+    
+    pymysql.install_as_MySQLdb()
     
     max_retries = 30
     retry_count = 0
     
     database_url = (
-        f"postgresql://{settings.POSTGRES_USER}:{settings.POSTGRES_PASSWORD}"
-        f"@{settings.POSTGRES_HOST}:{settings.POSTGRES_PORT}/{settings.POSTGRES_DB}"
+        f"mysql+pymysql://{settings.MYSQL_USER}:{settings.MYSQL_PASSWORD}"
+        f"@{settings.MYSQL_HOST}:{settings.MYSQL_PORT}/{settings.MYSQL_DB}?charset=utf8mb4"
     )
     
     while retry_count < max_retries:

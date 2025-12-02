@@ -44,8 +44,8 @@ class Listing(Base):
     
     # Metadata
     is_active = Column(Boolean, default=True)
-    first_seen = Column(DateTime(timezone=True), server_default=func.now())
-    last_updated = Column(DateTime(timezone=True), server_default=func.now(), onupdate=func.now())
+    first_seen = Column(DateTime, server_default=func.now())
+    last_updated = Column(DateTime, server_default=func.now(), onupdate=func.now())
     
     # Unique constraint on source and source_id
     __table_args__ = (

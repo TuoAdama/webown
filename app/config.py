@@ -9,11 +9,11 @@ class Settings(BaseSettings):
     """Application settings loaded from environment variables."""
     
     # Database Configuration
-    POSTGRES_HOST: str = "postgres"
-    POSTGRES_PORT: int = 5432
-    POSTGRES_DB: str = "webown"
-    POSTGRES_USER: str = "webown"
-    POSTGRES_PASSWORD: str = "webown_password"
+    MYSQL_HOST: str = "mysql"
+    MYSQL_PORT: int = 3306
+    MYSQL_DB: str = "webown"
+    MYSQL_USER: str = "webown"
+    MYSQL_PASSWORD: str = "webown_password"
     
     # Redis Configuration
     REDIS_HOST: str = "redis"

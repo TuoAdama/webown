@@ -31,8 +31,8 @@ test: ## Run tests (when implemented)
 shell: ## Open a shell in the app container
 	docker-compose exec app /bin/bash
 
-db-shell: ## Open PostgreSQL shell
-	docker-compose exec postgres psql -U webown -d webown
+db-shell: ## Open MySQL shell
+	docker-compose exec mysql mysql -u webown -p webown
 
 scrape-once: ## Run scraping once
 	docker-compose exec app python -c "from app.scheduler import ScrapingScheduler; s = ScrapingScheduler(); s.run_once()"

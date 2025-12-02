@@ -6,7 +6,7 @@ Application Python centrale pour le scraping de sites web de recherche de logeme
 
 L'application est construite avec :
 - **Python 3.11** - Langage principal
-- **PostgreSQL** - Base de données pour stocker les annonces
+- **MySQL 8.0** - Base de données pour stocker les annonces
 - **Redis** - Cache et gestion des queues (prévu pour futures fonctionnalités)
 - **Docker Compose** - Orchestration des services
 - **APScheduler** - Planification des tâches de scraping
@@ -20,7 +20,7 @@ L'application est construite avec :
   - SeLoger.com
   - La Carte des Coloc
 - ✅ Scheduler automatique pour récupérer les dernières annonces
-- ✅ Base de données PostgreSQL pour la persistance
+- ✅ Base de données MySQL pour la persistance
 - ✅ Système de logging complet
 - ✅ Gestion des doublons (basée sur source + source_id)
 - ✅ Configuration via variables d'environnement
@@ -42,7 +42,7 @@ cd webown
 
 2. **Configurer les variables d'environnement**
 ```bash
-cp .env.example .env
+cp env.example .env
 # Éditer .env selon vos besoins
 ```
 
@@ -91,7 +91,7 @@ webown/
 ├── docker-compose.yml         # Configuration Docker Compose
 ├── Dockerfile                 # Image Docker de l'application
 ├── requirements.txt           # Dépendances Python
-├── .env.example              # Exemple de configuration
+├── env.example                # Exemple de configuration
 └── main.py                   # Point d'entrée principal
 ```
 
@@ -100,7 +100,7 @@ webown/
 Les paramètres sont configurés via le fichier `.env` :
 
 ### Base de données
-- `POSTGRES_HOST`, `POSTGRES_PORT`, `POSTGRES_DB`, `POSTGRES_USER`, `POSTGRES_PASSWORD`
+- `MYSQL_HOST`, `MYSQL_PORT`, `MYSQL_DB`, `MYSQL_USER`, `MYSQL_PASSWORD`, `MYSQL_ROOT_PASSWORD`
 
 ### Redis
 - `REDIS_HOST`, `REDIS_PORT`
@@ -134,7 +134,12 @@ docker-compose exec app python -c "from app.scheduler import ScrapingScheduler; 
 ### Accéder à la base de données
 
 ```bash
-docker-compose exec postgres psql -U webown -d webown
+docker-compose exec mysql mysql -u webown -p webown
+```
+
+Ou avec le mot de passe root :
+```bash
+docker-compose exec mysql mysql -u root -p webown
 ```
 
 ### Requêtes SQL utiles

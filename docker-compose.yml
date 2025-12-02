@@ -1,22 +1,25 @@
 version: '3.8'
 
 services:
-  postgres:
-    image: postgres:15-alpine
-    container_name: webown_postgres
+  mysql:
+    image: mysql:8.4.3
+    container_name: webown_mysql
     environment:
-      POSTGRES_DB: ${POSTGRES_DB:-webown}
-      POSTGRES_USER: ${POSTGRES_USER:-webown}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-webown_password}
+      MYSQL_DATABASE: ${MYSQL_DB:-webown}
+      MYSQL_USER: ${MYSQL_USER:-webown}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD:-webown_password}
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-root_password}
     ports:
-      - "5432:5432"
+      - "3306:3306"
     volumes:
-      - postgres_data:/var/lib/postgresql/data
+      - mysql_data:/var/lib/mysql
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-webown}"]
+      test: ["CMD", "sh", "-c", "mysqladmin ping -h localhost -u root -p$$MYSQL_ROOT_PASSWORD || exit 1"]
       interval: 10s
       timeout: 5s
       retries: 5
+      start_period: 10s
+    command: --default-authentication-plugin=mysql_native_password
 
   redis:
     image: redis:7-alpine
@@ -37,16 +40,16 @@ services:
       dockerfile: Dockerfile
     container_name: webown_app
     depends_on:
-      postgres:
+      mysql:
         condition: service_healthy
       redis:
         condition: service_healthy
     environment:
-      - POSTGRES_HOST=postgres
-      - POSTGRES_PORT=5432
-      - POSTGRES_DB=${POSTGRES_DB:-webown}
-      - POSTGRES_USER=${POSTGRES_USER:-webown}
-      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-webown_password}
+      - MYSQL_HOST=mysql
+      - MYSQL_PORT=3306
+      - MYSQL_DB=${MYSQL_DB:-webown}
+      - MYSQL_USER=${MYSQL_USER:-webown}
+      - MYSQL_PASSWORD=${MYSQL_PASSWORD:-webown_password}
       - REDIS_HOST=redis
       - REDIS_PORT=6379
       - ENVIRONMENT=${ENVIRONMENT:-development}
@@ -57,6 +60,6 @@ services:
     restart: unless-stopped
 
 volumes:
-  postgres_data:
+  mysql_data:
   redis_data:
 
