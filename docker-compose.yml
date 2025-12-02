@@ -1,0 +1,62 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:15-alpine
+    container_name: webown_postgres
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-webown}
+      POSTGRES_USER: ${POSTGRES_USER:-webown}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-webown_password}
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-webown}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:7-alpine
+    container_name: webown_redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: webown_app
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    environment:
+      - POSTGRES_HOST=postgres
+      - POSTGRES_PORT=5432
+      - POSTGRES_DB=${POSTGRES_DB:-webown}
+      - POSTGRES_USER=${POSTGRES_USER:-webown}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-webown_password}
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - ENVIRONMENT=${ENVIRONMENT:-development}
+    volumes:
+      - ./app:/app
+      - ./logs:/app/logs
+    command: python main.py
+    restart: unless-stopped
+
+volumes:
+  postgres_data:
+  redis_data:
+
