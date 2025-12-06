@@ -30,9 +30,6 @@ def get_url(se_loger: SeLoger, location: None):
     }
 
     params = {k: v for k, v in params.items() if v is not None}
-    print(params)
-
-
     return f"{base_url}?{urlencode(params)}"
 
 
