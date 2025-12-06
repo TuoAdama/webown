@@ -3,7 +3,7 @@ import requests
 from app.models.se_loger import SeLoger
 from urllib.parse import urlencode
 
-url = "https://www.seloger.com/"
+se_loger_url = "https://www.seloger.com"
 
 
 def scrape(se_loger: SeLoger):
@@ -11,11 +11,11 @@ def scrape(se_loger: SeLoger):
     if auto_completion is None:
         return
     ids = [item['id'] for item in auto_completion if len(item['id']) == 11]
-    searchUrl = _get_url(se_loger, ids[0] if len(ids) else None)
-    print(searchUrl)
+    search_url = get_url(se_loger, ids[0] if len(ids) else None)
+    print(search_url)
 
-def _get_url(se_loger: SeLoger, location: None):
-    base_url = "https://www.seloger.com/classified-search"
+def get_url(se_loger: SeLoger, location: None):
+    base_url = f"{se_loger_url}/classified-search"
     params = {
         "locations": location,
         "priceMin": se_loger.min_price,
@@ -66,7 +66,7 @@ def get_autocomplete(location_or_postal_code: str) -> Optional[list]:
         ],
         "locale": "fr"
     }
-    response = requests.post("https://www.seloger.com/search-mfe-bff/autocomplete", json=data)
+    response = requests.post(f"{se_loger_url}/search-mfe-bff/autocomplete", json=data)
     if response.status_code != 200:
         return None
     return response.json()
