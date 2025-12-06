@@ -21,6 +21,8 @@ def scrape(se_loger: SeLoger):
     print(element)
     element.click()
     firefox.close()
+
+
 def get_autocomplete(text: str) -> Optional[list]:
     data = {
         "text": text,
