@@ -2,6 +2,7 @@ from typing import Optional
 from urllib.parse import urlencode
 import requests
 from selenium import webdriver
+from selenium.common import NoSuchElementException
 from selenium.webdriver.common.by import By
 from selenium.webdriver.remote.webelement import WebElement
 
@@ -20,7 +21,7 @@ def scrape(se_loger: SeLoger):
     driver = webdriver.Firefox()
     driver.get(search_url)
     cards = driver.find_elements(By.XPATH, "//*[starts-with(@id, 'classified-card-')]")
-    results = [card_to_result(card) for card in cards]
+    results = [card_to_result(card) for card in cards if card is not None]
     driver.close()
 
 def get_url(se_loger: SeLoger, location: None):
@@ -74,5 +75,12 @@ def get_autocomplete(location_or_postal_code: str) -> Optional[list]:
     return response.json()
 
 def card_to_result(card: WebElement):
-    print(card.text)
-    return SeLogerResult()
+    result = SeLogerResult()
+    try:
+        result.link = card.find_element(By.TAG_NAME, "a").get_attribute("href")
+        main_image_container = card.find_element(By.XPATH, './/div[@data-testid="card-mfe-picture-box-gallery-test-id"]')
+        main_image = main_image_container.find_element(By.TAG_NAME, "img")
+        result.images.append(main_image.get_attribute("src"))
+    except NoSuchElementException:
+        return None
+    return result
