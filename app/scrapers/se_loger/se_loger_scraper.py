@@ -2,12 +2,10 @@ from typing import Optional
 from urllib.parse import urlencode
 import requests
 from selenium import webdriver
-from selenium.common import NoSuchElementException
 from selenium.webdriver.common.by import By
-from selenium.webdriver.remote.webelement import WebElement
 
 from app.models.se_loger import SeLoger
-from app.models.se_loger_result import SeLogerResult
+from app.scrapers.se_loger.se_loger_card import card_to_result
 
 se_loger_url = "https://www.seloger.com"
 
@@ -15,7 +13,7 @@ se_loger_url = "https://www.seloger.com"
 def scrape(se_loger: SeLoger):
     auto_completion = get_autocomplete(se_loger.city_name)
     if auto_completion is None:
-        return
+        return None
     ids = [item['id'] for item in auto_completion if len(item['id']) == 11]
     search_url = get_url(se_loger, ids[0] if len(ids) else None)
     driver = webdriver.Firefox()
@@ -23,6 +21,7 @@ def scrape(se_loger: SeLoger):
     cards = driver.find_elements(By.XPATH, "//*[starts-with(@id, 'classified-card-')]")
     results = [card_to_result(card) for card in cards if card is not None]
     driver.close()
+    return results
 
 def get_url(se_loger: SeLoger, location: None):
     base_url = f"{se_loger_url}/classified-search"
@@ -73,14 +72,3 @@ def get_autocomplete(location_or_postal_code: str) -> Optional[list]:
     if response.status_code != 200:
         return None
     return response.json()
-
-def card_to_result(card: WebElement):
-    result = SeLogerResult()
-    try:
-        result.link = card.find_element(By.TAG_NAME, "a").get_attribute("href")
-        main_image_container = card.find_element(By.XPATH, './/div[@data-testid="card-mfe-picture-box-gallery-test-id"]')
-        main_image = main_image_container.find_element(By.TAG_NAME, "img")
-        result.images.append(main_image.get_attribute("src"))
-    except NoSuchElementException:
-        return None
-    return result

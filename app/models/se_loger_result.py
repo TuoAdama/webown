@@ -10,3 +10,8 @@ class SeLogerResult:
         self.type_searching = TypeSearching.RENT.value
         self.link: Optional[str] = None
         self.images: list[str] = []
+        self.baths: Optional[int] = None
+        self.floors: Optional[dict] = {
+            "floor": None,
+            "total": None,
+        }
