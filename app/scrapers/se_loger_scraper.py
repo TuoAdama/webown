@@ -1,7 +1,12 @@
 from typing import Optional
-import requests
-from app.models.se_loger import SeLoger
 from urllib.parse import urlencode
+import requests
+from selenium import webdriver
+from selenium.webdriver.common.by import By
+from selenium.webdriver.remote.webelement import WebElement
+
+from app.models.se_loger import SeLoger
+from app.models.se_loger_result import SeLogerResult
 
 se_loger_url = "https://www.seloger.com"
 
@@ -12,7 +17,11 @@ def scrape(se_loger: SeLoger):
         return
     ids = [item['id'] for item in auto_completion if len(item['id']) == 11]
     search_url = get_url(se_loger, ids[0] if len(ids) else None)
-    print(search_url)
+    driver = webdriver.Firefox()
+    driver.get(search_url)
+    cards = driver.find_elements(By.XPATH, "//*[starts-with(@id, 'classified-card-')]")
+    results = [card_to_result(card) for card in cards]
+    driver.close()
 
 def get_url(se_loger: SeLoger, location: None):
     base_url = f"{se_loger_url}/classified-search"
@@ -28,12 +37,8 @@ def get_url(se_loger: SeLoger, location: None):
         "numberOfRoomsMin": se_loger.number_of_rooms_min,
         "numberOfRoomsMax": se_loger.number_of_rooms_max,
     }
-
     params = {k: v for k, v in params.items() if v is not None}
     return f"{base_url}?{urlencode(params)}"
-
-
-
 
 def get_autocomplete(location_or_postal_code: str) -> Optional[list]:
     data = {
@@ -67,3 +72,7 @@ def get_autocomplete(location_or_postal_code: str) -> Optional[list]:
     if response.status_code != 200:
         return None
     return response.json()
+
+def card_to_result(card: WebElement):
+    print(card.text)
+    return SeLogerResult()
