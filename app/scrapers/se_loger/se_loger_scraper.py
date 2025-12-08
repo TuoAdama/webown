@@ -6,6 +6,7 @@ from selenium.webdriver.common.by import By
 
 from app.models.se_loger import SeLoger
 from app.scrapers.se_loger.se_loger_card import card_to_result
+from selenium.webdriver.firefox.options import Options
 
 se_loger_url = "https://www.seloger.com"
 
@@ -16,7 +17,9 @@ def scrape(se_loger: SeLoger):
         return None
     ids = [item['id'] for item in auto_completion if len(item['id']) == 11]
     search_url = get_url(se_loger, ids[0] if len(ids) else None)
-    driver = webdriver.Firefox()
+    options = Options()
+    options.add_argument("--headless")
+    driver = webdriver.Firefox(options=options)
     driver.get(search_url)
     cards = driver.find_elements(By.XPATH, "//*[starts-with(@id, 'classified-card-')]")
     results = [card_to_result(card) for card in cards if card is not None]
