@@ -1,2 +1,0 @@
-# Webown - Central Scraping Application
-
