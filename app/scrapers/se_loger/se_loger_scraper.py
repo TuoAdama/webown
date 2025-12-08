@@ -3,15 +3,23 @@ from urllib.parse import urlencode
 import requests
 from selenium import webdriver
 from selenium.webdriver.common.by import By
-
+import logging
 from app.models.se_loger import SeLoger
 from app.scrapers.se_loger.se_loger_card import card_to_result
 from selenium.webdriver.firefox.options import Options
 
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s | %(levelname)s | %(message)s",
+    handlers=[
+        logging.FileHandler("logs/se_loger.log"),
+        logging.StreamHandler()
+    ]
+)
 se_loger_url = "https://www.seloger.com"
 
-
 def scrape(se_loger: SeLoger):
+    logging.info(f"Starting scraping: {se_loger.__dict__}")
     auto_completion = get_autocomplete(se_loger.city_name)
     if auto_completion is None:
         return None
@@ -25,6 +33,7 @@ def scrape(se_loger: SeLoger):
     driver.get(search_url)
     cards = driver.find_elements(By.XPATH, "//*[starts-with(@id, 'classified-card-')]")
     results = [card_to_result(card) for card in cards if card is not None]
+    logging.info(f"End scraping. Result found: {len(results)}")
     driver.close()
     return results
 
