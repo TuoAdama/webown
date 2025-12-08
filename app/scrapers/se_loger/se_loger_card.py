@@ -11,6 +11,7 @@ def card_to_result(card: WebElement):
         return None
     result = SeLogerResult()
     try:
+        result.id = get_id(card)
         result.link = get_link(card)
         result.images.append(get_image(card))
         result.price = get_price(card)
@@ -64,6 +65,13 @@ def get_floors(description: str):
             "floor": int(match.group(1)),
             "total": int(match.group(2)),
         }
+    return None
+
+def get_id(card: WebElement):
+    # extract last id (248GPIYASUUW) on string like this classified-card-248GPIYASUUW
+    match = re.search(r'classified-card-(\w+)', card.get_attribute("id"))
+    if match:
+        return match.group(1)
     return None
 
 
