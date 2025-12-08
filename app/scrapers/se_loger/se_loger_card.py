@@ -6,6 +6,9 @@ import re
 from app.models.se_loger_result import SeLogerResult
 
 def card_to_result(card: WebElement):
+    text = card.text
+    if not len(text.strip()):
+        return None
     result = SeLogerResult()
     try:
         result.link = get_link(card)
@@ -65,8 +68,7 @@ def get_floors(description: str):
 
 
 def get_description(card: WebElement):
-    return get_element_by_xpath(card, './/div[@data-testid="cardmfe-keyfacts-testid"]')
-
+    return get_element_by_xpath(card, './/div[@data-testid="cardmfe-description-box-text-test-id"]')
 
 def get_element_by_xpath(card: WebElement, xpath: str):
     return card.find_element(By.XPATH, xpath)
