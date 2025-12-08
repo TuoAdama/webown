@@ -19,6 +19,8 @@ def scrape(se_loger: SeLoger):
     search_url = get_url(se_loger, ids[0] if len(ids) else None)
     options = Options()
     options.add_argument("--headless")
+    options.add_argument("--no-sandbox")
+    options.add_argument("--disable-dev-shm-usage")
     driver = webdriver.Firefox(options=options)
     driver.get(search_url)
     cards = driver.find_elements(By.XPATH, "//*[starts-with(@id, 'classified-card-')]")
