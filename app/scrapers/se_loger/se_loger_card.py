@@ -6,8 +6,7 @@ import re
 from app.models.se_loger_result import SeLogerResult
 
 def card_to_result(card: WebElement):
-    text = card.text
-    if not len(text.strip()):
+    if not len(card.text.strip()):
         return None
     result = SeLogerResult()
     try:
