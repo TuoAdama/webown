@@ -1,5 +1,6 @@
 from typing import Optional
 from urllib.parse import urlencode
+from pathlib import Path
 import requests
 from selenium import webdriver
 from selenium.webdriver.common.by import By
@@ -7,6 +8,9 @@ import logging
 from app.models.se_loger import SeLoger
 from app.scrapers.se_loger.se_loger_card import card_to_result
 from selenium.webdriver.firefox.options import Options
+
+# Ensure log directory exists before FileHandler is configured.
+Path("logs").mkdir(parents=True, exist_ok=True)
 
 logging.basicConfig(
     level=logging.INFO,

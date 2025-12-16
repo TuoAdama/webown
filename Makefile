@@ -35,5 +35,5 @@ db-shell: ## Open MySQL shell
 	docker-compose exec mysql mysql -u webown -p webown
 
 scrape-once: ## Run scraping once
-	docker-compose exec app python -c "from app.scheduler import ScrapingScheduler; s = ScrapingScheduler(); s.run_once()"
+	docker-compose exec app python main.py
 
