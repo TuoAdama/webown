@@ -1,5 +1,3 @@
-import json
-
 import app.scrapers.se_loger.se_loger_scraper as se_loger_scraper
 from app.models.se_loger import SeLoger
 
