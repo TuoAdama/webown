@@ -37,10 +37,10 @@ def scrape(se_loger: SeLoger):
     driver.close()
     return results
 
-def get_url(se_loger: SeLoger, location: None):
+def get_url(se_loger: SeLoger, location: Optional[str]):
     base_url = f"{se_loger_url}/classified-search"
     params = {
-        "locations": location,
+        "locations": location if location else None,
         "priceMin": se_loger.min_price,
         "priceMax": se_loger.max_price,
         "distributionTypes": (

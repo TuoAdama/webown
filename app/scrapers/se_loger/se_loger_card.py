@@ -16,7 +16,7 @@ def card_to_result(card: WebElement):
         result.price = get_price(card)
         description = get_description(card).text
         result.space = get_space(description)
-        result.baths = get_baths(description)
+        result.baths = get_bedrooms(description)
         result.floors = get_floors(description)
     except NoSuchElementException:
         return None
@@ -51,7 +51,7 @@ def get_num_of_rooms(description: str):
         return int(match.group(1))
     return None
 
-def get_baths(description: str):
+def get_bedrooms(description: str):
     match = re.search(r'(\d+)\s*chambres?', description)
     if match:
         return int(match.group(1))
