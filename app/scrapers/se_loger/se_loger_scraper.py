@@ -30,12 +30,17 @@ def scrape(se_loger: SeLoger):
     options.add_argument("--no-sandbox")
     options.add_argument("--disable-dev-shm-usage")
     driver = webdriver.Firefox(options=options)
-    driver.get(search_url)
-    cards = driver.find_elements(By.XPATH, "//*[starts-with(@id, 'classified-card-')]")
-    results = [card_to_result(card) for card in cards if card is not None]
-    logging.info(f"End scraping. Result found: {len(results)}")
-    driver.close()
-    return results
+    try:
+        driver.get(search_url)
+        cards = driver.find_elements(By.XPATH, "//*[starts-with(@id, 'classified-card-')]")
+        results = [card_to_result(card) for card in cards if card is not None]
+        logging.info(f"End scraping. Result found: {len(results)}")
+        return results
+    except Exception as e:
+        logging.error(f"Error scraping: {e}")
+        return None
+    finally:
+        driver.close()
 
 def get_url(se_loger: SeLoger, location: Optional[str]):
     base_url = f"{se_loger_url}/classified-search"
