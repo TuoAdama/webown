@@ -40,7 +40,7 @@ def scrape(se_loger: SeLoger):
         logging.error(f"Error scraping: {e}")
         return None
     finally:
-        driver.close()
+        driver.quit()
 
 def get_url(se_loger: SeLoger, location: Optional[str]):
     base_url = f"{se_loger_url}/classified-search"
