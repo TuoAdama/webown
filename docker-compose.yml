@@ -35,10 +35,8 @@ services:
       - REDIS_PORT=6379
       - ENVIRONMENT=${ENVIRONMENT:-development}
     volumes:
-      - ./app:/app
-      - ./logs:/app/logs
+      - .:/app
     command: python main.py
-
 volumes:
   mysql_data:
   redis_data:
