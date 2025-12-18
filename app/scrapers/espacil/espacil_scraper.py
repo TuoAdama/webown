@@ -52,6 +52,7 @@ def extract_properties(html_content: str) -> List[Dict[str, Any]]:
         - rooms: Number of rooms (int or None)
         - price: Monthly rent amount (float or None)
         - charges_included: Whether charges are included (bool)
+        - images: List of image URLs (list[str])
     """
     soup = BeautifulSoup(html_content, 'html.parser')
     properties = []
@@ -63,7 +64,8 @@ def extract_properties(html_content: str) -> List[Dict[str, Any]]:
         property_info = {
             'rooms': None,
             'price': None,
-            'charges_included': False
+            'charges_included': False,
+            'images': []
         }
         
         # Extract number of rooms from info paragraph
@@ -95,6 +97,26 @@ def extract_properties(html_content: str) -> List[Dict[str, Any]]:
                     property_info['price'] = float(price_str)
                 except ValueError:
                     logging.warning(f"Could not parse price from: {price_text}")
+        
+        # Extract images from thumbnail div
+        thumb_div = article.find('div', class_='posts_list-one-thumb')
+        if thumb_div:
+            img_tag = thumb_div.find('img')
+            if img_tag:
+                # Get main image from src attribute
+                main_image = img_tag.get('src')
+                if main_image:
+                    property_info['images'].append(main_image)
+                
+                # Also check srcset for additional image sizes
+                srcset = img_tag.get('srcset')
+                if srcset:
+                    # Parse srcset format: "url1 size1, url2 size2"
+                    srcset_urls = [url.strip().split()[0] for url in srcset.split(',') if url.strip()]
+                    # Add unique URLs from srcset that are not already in images list
+                    for url in srcset_urls:
+                        if url and url not in property_info['images']:
+                            property_info['images'].append(url)
         
         properties.append(property_info)
     
