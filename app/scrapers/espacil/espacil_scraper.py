@@ -33,10 +33,15 @@ def scrape(espacil: Espacil):
 
     logging.info(f"Starting scraping: {espacil.__dict__}")
 
-    url = get_url(espacil)
+    url = get_url(espacil, base_url)
     logging.info(f"URL: {url}")
 
     response = requests.get(url)
+    
+    # Check HTTP status code before processing response
+    if response.status_code != 200:
+        logging.error(f"HTTP request failed with status code {response.status_code} for URL: {url}")
+        return None
     
     # Log response metadata at INFO level (best practice)
     content_length = len(response.text) if response.text else 0
@@ -61,7 +66,7 @@ def scrape(espacil: Espacil):
 
     return extract_properties(response.text)
 
-def get_url(espacil: Espacil):
+def get_url(espacil: Espacil, base_url: str):
     params = {
         "switch": "louer",
         "type": "logements",
