@@ -53,6 +53,9 @@ def extract_properties(html_content: str) -> List[Dict[str, Any]]:
         - price: Monthly rent amount (float or None)
         - charges_included: Whether charges are included (bool)
         - images: List of image URLs (list[str])
+        - url: Property URL (str or None)
+        - title: Property title (str or None)
+        - postal_code: Postal code (str or None)
     """
     soup = BeautifulSoup(html_content, 'html.parser')
     properties = []
@@ -65,10 +68,27 @@ def extract_properties(html_content: str) -> List[Dict[str, Any]]:
             'rooms': None,
             'price': None,
             'charges_included': False,
-            'images': []
+            'images': [],
+            'url': None,
+            'title': None,
+            'postal_code': None
         }
         
-        # Extract number of rooms from info paragraph
+        # Extract URL from the link tag
+        link_tag = article.find('a', class_='posts_list-one-inner')
+        if link_tag:
+            property_url = link_tag.get('href')
+            if property_url:
+                property_info['url'] = property_url
+        
+        # Extract title from title paragraph
+        title_paragraph = article.find('p', class_='title')
+        if title_paragraph:
+            title_text = title_paragraph.get_text(strip=True)
+            if title_text:
+                property_info['title'] = title_text
+        
+        # Extract number of rooms and postal code from info paragraph
         info_paragraph = article.find('p', class_='info')
         if info_paragraph:
             info_text = info_paragraph.get_text(strip=True)
@@ -79,6 +99,12 @@ def extract_properties(html_content: str) -> List[Dict[str, Any]]:
                     property_info['rooms'] = int(rooms_match.group(1))
                 except ValueError:
                     logging.warning(f"Could not parse rooms number from: {info_text}")
+            
+            # Extract postal code (5-digit number, typically at the end)
+            # Format: "1 pièce, 44, 44700" where 44700 is the postal code
+            postal_code_match = re.search(r'\b(\d{5})\b', info_text)
+            if postal_code_match:
+                property_info['postal_code'] = postal_code_match.group(1)
         
         # Extract price from price paragraph
         price_paragraph = article.find('p', class_='price')
