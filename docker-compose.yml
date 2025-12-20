@@ -2,7 +2,7 @@ version: '3.8'
 
 services:
   app:
-    image: webown:latest
+    image: tuoadama/webown:1.0
     env_file:
       - .env.local
     ports:
