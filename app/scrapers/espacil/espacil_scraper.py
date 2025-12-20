@@ -5,6 +5,7 @@ import requests
 from bs4 import BeautifulSoup
 from typing import List, Dict, Any
 import re
+import os
 
 logging.basicConfig(
     level=logging.INFO,
@@ -15,6 +16,15 @@ logging.basicConfig(
     ]
 )
 
+# Setup debug logger for full HTML logging (only if LOG_FULL_HTML is enabled)
+debug_logger = logging.getLogger("espacil.debug")
+if os.getenv("LOG_FULL_HTML", "false").lower() == "true" and not debug_logger.handlers:
+    debug_handler = logging.FileHandler("logs/espacil_debug.log")
+    debug_handler.setLevel(logging.DEBUG)
+    debug_handler.setFormatter(logging.Formatter("%(asctime)s | %(levelname)s | %(message)s"))
+    debug_logger.addHandler(debug_handler)
+    debug_logger.setLevel(logging.DEBUG)
+
 base_url = "https://www.espacil-habitat.fr/devenir-locataire/rechercher-un-bien/"
 
 def scrape(espacil: Espacil):
@@ -24,7 +34,27 @@ def scrape(espacil: Espacil):
     logging.info(f"URL: {url}")
 
     response = requests.get(url)
-    logging.info(f"Response: {response.text}")
+    
+    # Log response metadata at INFO level (best practice)
+    content_length = len(response.text) if response.text else 0
+    logging.info(f"Response status: {response.status_code}, Content-Length: {content_length} bytes")
+    
+    # Log HTML preview at INFO level (first 500 chars for quick debugging)
+    if response.text:
+        preview_length = 500
+        html_preview = response.text[:preview_length]
+        if len(response.text) > preview_length:
+            logging.info(f"HTML preview (first {preview_length} chars): {html_preview}...")
+        else:
+            logging.info(f"HTML content: {html_preview}")
+    
+    # Log full HTML at DEBUG level (only when DEBUG logging is enabled)
+    # This allows developers to enable full HTML logging when needed without polluting production logs
+    logging.debug(f"Full HTML response: {response.text}")
+    
+    # Optionally log full HTML to a separate debug file if environment variable is set
+    if os.getenv("LOG_FULL_HTML", "false").lower() == "true":
+        debug_logger.debug(f"Full HTML response for URL {url}:\n{response.text}")
 
     return extract_properties(response.text)
 
