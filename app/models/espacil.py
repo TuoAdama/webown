@@ -6,3 +6,4 @@ class Espacil:
         self.city_name = city_name
         self.type_house_space: Optional[TypeHouseSpace] = None
         self.price_max: int = 1_000
+        self.surface_min: Optional[float] = None
