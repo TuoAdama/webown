@@ -36,7 +36,7 @@ def scrape(espacil: Espacil):
     url = get_url(espacil, base_url)
     logging.info(f"URL: {url}")
 
-    response = requests.get(url)
+    response = requests.get(url, timeout=10)
     
     # Check HTTP status code before processing response
     if response.status_code != 200:
