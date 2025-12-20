@@ -25,11 +25,12 @@ if os.getenv("LOG_FULL_HTML", "false").lower() == "true" and not debug_logger.ha
     debug_logger.addHandler(debug_handler)
     debug_logger.setLevel(logging.DEBUG)
 
-base_url = os.getenv("ESPACIL_BASE_URL")
-if not base_url:
-    raise ValueError("ESPACIL_BASE_URL is not set")
 
 def scrape(espacil: Espacil):
+    base_url = os.getenv("ESPACIL_BASE_URL")
+    if not base_url:
+        raise ValueError("ESPACIL_BASE_URL is not set")
+
     logging.info(f"Starting scraping: {espacil.__dict__}")
 
     url = get_url(espacil)
