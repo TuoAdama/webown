@@ -11,7 +11,7 @@ def card_to_result(card: WebElement):
     result = SeLogerResult()
     try:
         result.id = get_id(card)
-        result.link = get_link(card)
+        result.url = get_link(card)
         result.images.append(get_image(card))
         result.price = get_price(card)
         description = get_description(card).text

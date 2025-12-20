@@ -9,7 +9,7 @@ class SeLogerResult:
         self.price: Optional[float] = None
         self.space: Optional[int] = None
         self.type_searching = TypeSearching.RENT.value
-        self.link: Optional[str] = None
+        self.url: Optional[str] = None
         self.images: list[str] = []
         self.baths: Optional[int] = None
         self.floors: Optional[dict] = {

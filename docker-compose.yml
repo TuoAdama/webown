@@ -1,43 +1,12 @@
 version: '3.8'
 
 services:
-  mysql:
-    image: mysql:8.4.3
-    environment:
-      MYSQL_DATABASE: ${MYSQL_DB:-webown}
-      MYSQL_USER: ${MYSQL_USER:-webown}
-      MYSQL_PASSWORD: ${MYSQL_PASSWORD:-webown_password}
-      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-root_password}
-    ports:
-      - "3306:3306"
-    volumes:
-      - mysql_data:/var/lib/mysql
-
-  redis:
-    image: redis:7-alpine
-    ports:
-      - "6379:6379"
-
   app:
-    build:
-      context: .
-      dockerfile: Dockerfile
-    depends_on:
-      - mysql
-      - redis
-    environment:
-      - MYSQL_HOST=mysql
-      - MYSQL_PORT=3306
-      - MYSQL_DB=${MYSQL_DB:-webown}
-      - MYSQL_USER=${MYSQL_USER:-webown}
-      - MYSQL_PASSWORD=${MYSQL_PASSWORD:-webown_password}
-      - REDIS_HOST=redis
-      - REDIS_PORT=6379
-      - ENVIRONMENT=${ENVIRONMENT:-development}
+    image: webown:latest
+    env_file:
+      - .env.local
+    ports:
+      - "8000:8000"
     volumes:
       - .:/app
     command: python main.py
-volumes:
-  mysql_data:
-  redis_data:
-
