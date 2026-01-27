@@ -4,11 +4,13 @@ import logging
 from app.enums.platform import Platform
 from app.models.se_loger import SeLoger
 from app.models.espacil import Espacil
+from app.models.studapart import Studapart
 from app.enums.type_searching import TypeSearching
 from app.dto.scrape_request import ScrapeRequestDTO
 from app.dto.scrape_response import ScrapeResponseDTO, PropertyDTO
 import app.scrapers.se_loger.se_loger_scraper as se_loger_scraper
 import app.scrapers.espacil.espacil_scraper as espacil_scraper
+import app.scrapers.studapart.studapart_scraper as studapart_scraper
 
 logging.basicConfig(
     level=logging.INFO,
@@ -25,7 +27,7 @@ def get_scrape_request(
     ville: str = Query(..., description="City name"),
     code_postal: Optional[str] = Query(None, description="Postal code"),
     prix_max: Optional[float] = Query(None, description="Maximum price"),
-    plateforme: str = Query(..., description="Platform name (SeLoger or Espacil)"),
+    plateforme: str = Query(..., description="Platform name (SeLoger, Espacil, or Studapart)"),
     surface_min: Optional[float] = Query(None, description="Minimum surface area in m²")
 ) -> ScrapeRequestDTO:
     """Dependency function to create ScrapeRequestDTO from query parameters"""
@@ -48,7 +50,7 @@ async def scrape_properties(
     - ville: City name (required)
     - code_postal: Postal code (optional)
     - prix_max: Maximum price (optional)
-    - plateforme: Platform name - SeLoger or Espacil (required)
+    - plateforme: Platform name - SeLoger, Espacil, or Studapart (required)
     - surface_min: Minimum surface area in m² (optional)
     
     Returns:
@@ -103,6 +105,27 @@ async def scrape_properties(
             
             # Scrape Espacil
             raw_results = espacil_scraper.scrape(espacil)
+            
+            # Convert results to PropertyDTO
+            if raw_results:
+                property_dtos = []
+                for result in raw_results:
+                    try:
+                        property_dtos.append(PropertyDTO(**result))
+                    except Exception as e:
+                        logging.warning(f"Error converting result to PropertyDTO: {str(e)}, result: {result}")
+                        continue
+                results = property_dtos
+        
+        elif platform_enum == Platform.STUDAPART:
+            # Create Studapart model
+            studapart = Studapart(request.ville)
+            
+            if request.prix_max:
+                studapart.price_max = int(request.prix_max)
+            
+            # Scrape Studapart
+            raw_results = studapart_scraper.scrape(studapart)
             
             # Convert results to PropertyDTO
             if raw_results:
