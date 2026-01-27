@@ -14,9 +14,14 @@ class PropertyDTO(BaseModel):
     title: Optional[str] = Field(None, description="Property title")
     postal_code: Optional[str] = Field(None, description="Postal code")
     
-    # SeLoger specific fields
+    # Common fields
     id: Optional[str] = Field(None, description="Property ID")
     space: Optional[float] = Field(None, description="Surface area in m²")
+    city: Optional[str] = Field(None, description="City name")
+    address: Optional[str] = Field(None, description="Property address")
+    property_type: Optional[str] = Field(None, description="Type of property (studio, apartment, room, etc.)")
+    
+    # SeLoger specific fields
     type_searching: Optional[str] = Field(None, description="Type of search (Buy/Rent)")
     baths: Optional[int] = Field(None, description="Number of bathrooms")
     floors: Optional[Dict[str, Optional[int]]] = Field(None, description="Floor information")
